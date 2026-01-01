@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sakura Bloom Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --bg-main: linear-gradient(145deg, #ffeaf1 0%, #fbd3e9 40%, #fdf6f9 100%);
+      --calc-body: #fffafb;
+      --display-bg: #ffe8f0;
+      --text-dark: #5a3a3a;
+      --text-light: #fff8f8;
+      --accent: #e8a2b8;
+      --accent-dark: #c26a85;
+      --highlight: #ffe1eb;
+      --glow: rgba(234, 163, 183, 0.45);
+    }
+
+    body {
+      background: var(--bg-main);
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .calculator {
+      background: var(--calc-body);
+      border-radius: 22px;
+      padding: 1.25rem;
+      width: 100%;
+      max-width: 340px;
+      border: 2px solid var(--accent);
+      box-shadow:
+        0 10px 30px rgba(0,0,0,.12),
+        0 0 25px var(--glow);
+    }
+
+    .title {
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.4rem;
+      color: var(--accent-dark);
+      margin-bottom: 0.75rem;
+    }
+
+    .display {
+      background: var(--display-bg);
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: right;
+      box-shadow: inset 0 3px 8px rgba(0,0,0,.12);
+    }
+
+    #expression {
+      font-size: .85rem;
+      opacity: .65;
+      min-height: 20px;
+    }
+
+    #result {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .buttons {
+      margin-top: 1.2rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: .65rem;
+    }
+
+    button {
+      padding: .9rem;
+      font-size: 1.1rem;
+      border-radius: 18px;
+      border: none;
+      cursor: pointer;
+      transition:
+        transform .18s cubic-bezier(.25,.8,.25,1),
+        box-shadow .18s ease,
+        filter .18s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,.12);
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      filter: brightness(1.08);
+    }
+
+    button:active {
+      transform: scale(.94);
+      box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    }
+
+    button.active {
+      box-shadow: 0 0 14px var(--glow);
+    }
+
+    .btn-num {
+      background: var(--highlight);
+      color: var(--text-dark);
+    }
+
+    .btn-op {
+      background: linear-gradient(145deg, #fbb6c9, #e8a2b8);
+      color: var(--text-light);
+    }
+
+    .btn-func {
+      background: #fcd9e4;
+      color: var(--text-dark);
+    }
+
+    .btn-eq {
+      background: linear-gradient(145deg, #c26a85, #e8a2b8);
+      color: var(--text-light);
+      font-weight: 700;
+      box-shadow: 0 0 14px var(--glow);
+    }
+
+    .zero {
+      grid-column: span 2;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="calculator">
+    <h1 class="title">Calculator</h1>
+
+    <div class="display">
+      <div id="expression"></div>
+      <div id="result">0</div>
+    </div>
+
+    <div class="buttons">
+      <button class="btn-func" data-value="clear">C</button>
+      <button class="btn-func" data-value="backspace">←</button>
+      <button class="btn-op" data-value="%">%</button>
+      <button class="btn-op" data-value="/">÷</button>
+
+      <button class="btn-num" data-value="7">7</button>
+      <button class="btn-num" data-value="8">8</button>
+      <button class="btn-num" data-value="9">9</button>
+      <button class="btn-op" data-value="*">×</button>
+
+      <button class="btn-num" data-value="4">4</button>
+      <button class="btn-num" data-value="5">5</button>
+      <button class="btn-num" data-value="6">6</button>
+      <button class="btn-op" data-value="-">−</button>
+
+      <button class="btn-num" data-value="1">1</button>
+      <button class="btn-num" data-value="2">2</button>
+      <button class="btn-num" data-value="3">3</button>
+      <button class="btn-op" data-value="+">+</button>
+
+      <button class="btn-num zero" data-value="0">0</button>
+      <button class="btn-num" data-value=".">.</button>
+      <button class="btn-eq" data-value="=">=</button>
+    </div>
+  </div>
+
+  <script>
+    const exprEl = document.getElementById("expression");
+    const resEl = document.getElementById("result");
+    const buttons = document.querySelectorAll("button");
+
+    let expression = "";
+
+    const format = (n) =>
+      Math.abs(n) > 1e12 || Math.abs(n) < 1e-10
+        ? n.toExponential(6)
+        : parseFloat(n.toFixed(10)).toString();
+
+    function reset() {
+      expression = "";
+      exprEl.textContent = "";
+      resEl.textContent = "0";
+    }
+
+    function appendValue(val) {
+      if (resEl.textContent === "Error") reset();
+
+      if (!isNaN(val) || val === ".") {
+        if (resEl.textContent === "0" && val !== ".") {
+          resEl.textContent = val;
+        } else if (val !== "." || !resEl.textContent.includes(".")) {
+          resEl.textContent += val;
+        }
+        return;
+      }
+
+      if (["+", "-", "*", "/", "%"].includes(val)) {
+        expression =
+          expression.replace(/[+\-*/%]$/, "") +
+          resEl.textContent +
+          val;
+        exprEl.textContent = expression.replace(/\*/g, "×").replace(/\//g, "÷");
+        resEl.textContent = "0";
+        return;
+      }
+
+      if (val === "=") {
+        try {
+          const safe = (expression + resEl.textContent)
+            .replace(/%/g, "/100")
+            .replace(/[^0-9+\-*/.]/g, "");
+          const result = eval(safe);
+          exprEl.textContent =
+            expression.replace(/\*/g, "×").replace(/\//g, "÷") +
+            resEl.textContent +
+            " =";
+          resEl.textContent = format(result);
+          expression = "";
+        } catch {
+          resEl.textContent = "Error";
+        }
+        return;
+      }
+
+      if (val === "clear") reset();
+
+      if (val === "backspace") {
+        resEl.textContent = resEl.textContent.slice(0, -1) || "0";
+      }
+    }
+
+    buttons.forEach((btn) =>
+      btn.addEventListener("click", () => {
+        appendValue(btn.dataset.value);
+        btn.classList.add("active");
+        setTimeout(() => btn.classList.remove("active"), 150);
+      })
+    );
+
+    document.addEventListener("keydown", (e) => {
+      const map = { Enter: "=", Backspace: "backspace", c: "clear" };
+      appendValue(map[e.key] || e.key);
+    });
+
+    reset();
+  </script>
+</body>
+</html>

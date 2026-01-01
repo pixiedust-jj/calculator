@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aether Contrast Calculator</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Aether Contrast - Monochromatic Blue Theme */
+    :root {
+      --da-bg: #0A0F1A;
+      --da-body: #10182A;
+      --da-display-bg: #0C1220;
+
+      --da-glow-color: #3A7AFE;
+      --da-display-text: #C9D6FF;
+
+      --da-accent-bg: #1E2A44;
+      --da-high-accent-bg: #2F3F69;
+
+      --da-num-bg: #E6ECFF;
+      --da-func-bg: var(--da-accent-bg);
+      --da-op-bg: var(--da-accent-bg);
+      --da-eq-bg: var(--da-high-accent-bg);
+
+      --da-shadow-dark: rgba(0, 0, 0, 0.4);
+      --da-text-dark: #10182A;
+      --da-text-light: #E6ECFF;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--da-bg);
+      transition: background-color 0.3s ease;
+    }
+
+    .calculator-body {
+      box-shadow: 0 4px 12px var(--da-shadow-dark),
+                  0 0 20px 5px rgba(58, 122, 254, 0.4);
+      background-color: var(--da-body);
+      border: 1px solid rgba(58, 122, 254, 0.4);
+      border-radius: 16px;
+    }
+
+    .display {
+      background-color: var(--da-display-bg);
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.8);
+      color: var(--da-display-text);
+      font-size: 2.5rem;
+      text-shadow: 0 0 5px rgba(100, 150, 255, 0.4);
+    }
+
+    .display #current-val {
+      font-weight: 700;
+    }
+
+    .button-base {
+      transition: all 0.1s ease;
+      font-weight: 600;
+      border-radius: 8px;
+      box-shadow: none;
+      color: var(--da-text-dark);
+    }
+
+    .button-base:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .button-base.active {
+      transform: scale(0.97);
+      filter: brightness(1.2);
+    }
+
+    .button-base:focus {
+      outline: 2px solid var(--da-glow-color);
+      outline-offset: 2px;
+    }
+
+    /* Number Buttons */
+    .btn-num {
+      background-color: var(--da-num-bg);
+      color: var(--da-text-dark);
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Functional Buttons & Operators */
+    .btn-func, .btn-op {
+      background-color: var(--da-accent-bg);
+      color: var(--da-text-light);
+    }
+
+    /* Equals Button */
+    .btn-eq {
+      background-color: var(--da-high-accent-bg);
+      color: var(--da-text-light);
+      font-weight: 800;
+      text-shadow: 0 0 5px var(--da-glow-color);
+    }
+
+    @media (max-width: 640px) {
+      .calculator-body {
+        width: 95%;
+        max-width: 400px;
+        padding: 1rem;
+      }
+      .display {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen p-4">
+  <div id="calculator" class="calculator-body w-full max-w-md p-6 mx-auto">
+    <h1 class="text-center text-xl mb-4" style="color: var(--da-display-text);">Aether Contrast</h1>
+
+    <div id="display" class="display h-24 mb-5 p-4 rounded-lg flex flex-col justify-end items-end text-right overflow-hidden">
+      <div id="current-op" class="text-base opacity-75 h-5 mb-1"></div>
+      <div id="current-val" class="font-light text-5xl">0</div>
+    </div>
+
+    <div class="grid grid-cols-4 gap-4">
+      <button data-value="clear" class="btn-func col-span-2 button-base p-4 text-2xl">C</button>
+      <button data-value="backspace" class="btn-func button-base p-4 text-2xl">←</button>
+      <button data-value="/" class="btn-op button-base p-4 text-2xl">÷</button>
+
+      <button data-value="7" class="btn-num button-base p-4 text-2xl">7</button>
+      <button data-value="8" class="btn-num button-base p-4 text-2xl">8</button>
+      <button data-value="9" class="btn-num button-base p-4 text-2xl">9</button>
+      <button data-value="*" class="btn-op button-base p-4 text-2xl">×</button>
+
+      <button data-value="4" class="btn-num button-base p-4 text-2xl">4</button>
+      <button data-value="5" class="btn-num button-base p-4 text-2xl">5</button>
+      <button data-value="6" class="btn-num button-base p-4 text-2xl">6</button>
+      <button data-value="-" class="btn-op button-base p-4 text-2xl">-</button>
+
+      <button data-value="1" class="btn-num button-base p-4 text-2xl">1</button>
+      <button data-value="2" class="btn-num button-base p-4 text-2xl">2</button>
+      <button data-value="3" class="btn-num button-base p-4 text-2xl">3</button>
+      <button data-value="+" class="btn-op button-base p-4 text-2xl">+</button>
+
+      <button data-value="0" class="btn-num col-span-2 button-base p-4 text-2xl">0</button>
+      <button data-value="." class="btn-num button-base p-4 text-2xl">.</button>
+      <button data-value="=" class="btn-eq button-base p-4 text-2xl">=</button>
+    </div>
+  </div>
+
+  <script>
+    const currentOpElement = document.getElementById('current-op');
+    const currentValElement = document.getElementById('current-val');
+    const buttons = document.querySelectorAll('[data-value]');
+
+    let currentExpression = '';
+    let waitingForSecondOperand = false;
+    let lastResult = null;
+    let error = false;
+
+    // Utility: Format Result
+    function formatResult(result) {
+      if (Math.abs(result) > 1e12 || Math.abs(result) < 1e-10) {
+        return result.toExponential(6);
+      }
+      return parseFloat(result.toFixed(12)).toString();
+    }
+
+    // Display update
+    function updateDisplay(value) {
+      if (error) {
+        currentValElement.textContent = 'Error';
+        currentOpElement.textContent = 'Press C';
+        return;
+      }
+      if (value.length > 15 && !value.includes('e')) {
+        currentValElement.textContent = parseFloat(value).toPrecision(10);
+      } else {
+        currentValElement.textContent = value || '0';
+      }
+    }
+
+    function updateExpressionDisplay() {
+      currentOpElement.textContent = currentExpression.replace(/\*/g, '×').replace(/\//g, '÷');
+    }
+
+    function resetCalculator() {
+      currentExpression = '';
+      waitingForSecondOperand = false;
+      lastResult = null;
+      error = false;
+      updateDisplay('0');
+      currentOpElement.textContent = '';
+    }
+
+    function handleNumber(number) {
+      if (error) return resetCalculator();
+      let display = currentValElement.textContent;
+      if (waitingForSecondOperand || display === '0') {
+        display = number;
+        waitingForSecondOperand = false;
+      } else {
+        if (display.length >= 15) return;
+        display += number;
+      }
+      updateDisplay(display);
+    }
+
+    function handleDecimal() {
+      if (error) return resetCalculator();
+      let display = currentValElement.textContent;
+      if (waitingForSecondOperand) {
+        display = '0.';
+        waitingForSecondOperand = false;
+      } else if (!display.includes('.')) {
+        display += '.';
+      }
+      updateDisplay(display);
+    }
+
+    function handleOperator(nextOperator) {
+      if (error) return resetCalculator();
+      const inputValue = currentValElement.textContent;
+      if (lastResult !== null && waitingForSecondOperand) {
+        currentExpression = `${lastResult}${nextOperator}`;
+        waitingForSecondOperand = true;
+        updateExpressionDisplay();
+        return;
+      }
+      if (waitingForSecondOperand && currentExpression.length > 0) {
+        currentExpression = currentExpression.slice(0, -1) + nextOperator;
+        updateExpressionDisplay();
+        return;
+      }
+      currentExpression += inputValue + nextOperator;
+      waitingForSecondOperand = true;
+      updateExpressionDisplay();
+    }
+
+    function handleEquals() {
+      if (error) return resetCalculator();
+      if (currentExpression === '' && lastResult === null) return;
+
+      const finalExpression = currentExpression + currentValElement.textContent;
+      try {
+        const safeExpression = finalExpression.replace(/[^0-9+\-*/.]/g, '');
+        if (!safeExpression) return;
+        let result = eval(safeExpression);
+        if (result === Infinity || isNaN(result)) {
+          error = true;
+          return updateDisplay('Error');
+        }
+        const formatted = formatResult(result);
+        lastResult = formatted;
+        currentExpression = '';
+        waitingForSecondOperand = true;
+        currentOpElement.textContent = finalExpression.replace(/\*/g, '×').replace(/\//g, '÷') + ' =';
+        updateDisplay(formatted);
+      } catch (e) {
+        console.error('Calculation Error:', e);
+        error = true;
+        updateDisplay('Error');
+      }
+    }
+
+    function handleBackspace() {
+      if (error) return resetCalculator();
+      let display = currentValElement.textContent;
+      if (waitingForSecondOperand) return;
+      display = display.length <= 1 ? '0' : display.slice(0, -1);
+      updateDisplay(display);
+    }
+
+    // Button click
+    buttons.forEach(btn => {
+      btn.addEventListener('click', e => {
+        const value = e.target.dataset.value;
+        if (!isNaN(parseFloat(value))) handleNumber(value);
+        else if (['+', '-', '*', '/'].includes(value)) handleOperator(value);
+        else if (value === '=') handleEquals();
+        else if (value === 'clear') resetCalculator();
+        else if (value === 'backspace') handleBackspace();
+        else if (value === '.') handleDecimal();
+      });
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', e => {
+      let key = e.key;
+      let targetButton = null;
+
+      if (!isNaN(parseInt(key))) {
+        targetButton = document.querySelector(`button[data-value="${key}"]`);
+      } else if (['+', '-', '*', '/'].includes(key)) {
+        targetButton = document.querySelector(`button[data-value="${key}"]`);
+      } else if (key === '.') {
+        targetButton = document.querySelector('button[data-value="."]');
+      } else if (key === 'Enter') {
+        targetButton = document.querySelector('button[data-value="="]');
+        e.preventDefault();
+      } else if (key === 'Backspace') {
+        targetButton = document.querySelector('button[data-value="backspace"]');
+      } else if (key === 'Delete' || key === 'c' || key === 'C') {
+        targetButton = document.querySelector('button[data-value="clear"]');
+      }
+
+      if (targetButton) {
+        targetButton.click();
+        targetButton.classList.add('active');
+        setTimeout(() => targetButton.classList.remove('active'), 100);
+      }
+    });
+
+    resetCalculator();
+  </script>
+</body>
+</html>
